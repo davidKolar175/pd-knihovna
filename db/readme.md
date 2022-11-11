@@ -1,0 +1,1 @@
+# V této složce budou soubory týkající se databáze
