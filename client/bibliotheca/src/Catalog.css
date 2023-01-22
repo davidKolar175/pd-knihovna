@@ -1,0 +1,61 @@
+.book-container {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+.book-container:last-child {
+    border-bottom: none;
+}
+
+.book-container img {
+    width: 200px;
+    height: auto;
+    margin-right: 1rem;
+}
+
+.book-container h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.book-container p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.book-container button {
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.book-container button:hover {
+    background-color: #3e8e41;
+}
+
+.logout-btn {
+    background-color: #e53935;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: auto;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.logout-btn:hover {
+    background-color: #c62828;
+}
