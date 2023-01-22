@@ -8,6 +8,7 @@ builder.Services.Configure<BookStoreDatabaseSettings>(
     builder.Configuration.GetSection("BookStoreDatabase"));
 
 builder.Services.AddSingleton<BooksService>();
+builder.Services.AddSingleton<UsersService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(
