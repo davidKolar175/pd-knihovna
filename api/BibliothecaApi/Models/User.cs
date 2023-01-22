@@ -14,5 +14,11 @@ public class User
     [BsonElement("Name")]
     [JsonPropertyName("Name")]
     public string UserName { get; set; } = null!;
+
+    public string LastName { get; set; } = null!;
+
+    public string NIN { get; set; } = null!;
+
+    public string Address { get; set; } = null!;
 }
 
