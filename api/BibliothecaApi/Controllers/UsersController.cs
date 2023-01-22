@@ -1,5 +1,6 @@
 ﻿using BibliothecaApi.Models;
 using BookStoreApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreApi.Controllers;
@@ -14,6 +15,7 @@ public class UsersController : ControllerBase
         _usersService = booksService;
 
     [HttpGet]
+    [Authorize]
     public async Task<List<User>> Get(string? name, string? lastName, string? address, string? nin) =>
         await _usersService.GetAsync(name, lastName, address, nin);
 
