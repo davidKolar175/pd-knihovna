@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookStoreApi.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
@@ -15,7 +16,6 @@ public class UsersController : ControllerBase
         _usersService = booksService;
 
     [HttpGet]
-    [Authorize]
     public async Task<List<User>> Get(string? name, string? lastName, string? address, string? nin) =>
         await _usersService.GetAsync(name, lastName, address, nin);
 
@@ -57,6 +57,7 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {

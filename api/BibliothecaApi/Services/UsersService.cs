@@ -2,6 +2,8 @@
 using BookStoreApi.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BookStoreApi.Services;
 
@@ -42,14 +44,35 @@ public class UsersService
     }
 
     public async Task<User?> GetAsync(string id) =>
-            await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-    public async Task CreateAsync(User newUser) =>
+    public async Task<User?> GetByUserNameAsync(string userName) =>
+        await _usersCollection.Find(x => x.UserName == userName).FirstOrDefaultAsync();
+
+    public async Task CreateAsync(User newUser) {
+        newUser.Password = Sha256Hash(newUser.Password);
         await _usersCollection.InsertOneAsync(newUser);
+    }
 
     public async Task UpdateAsync(string id, User updatedUser) =>
         await _usersCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
 
     public async Task RemoveAsync(string id) =>
         await _usersCollection.DeleteOneAsync(x => x.Id == id);
+
+    public static string Sha256Hash(string value)
+    {
+        var sb = new StringBuilder();
+
+        using (var hash = SHA256.Create())
+        {
+            var enc = Encoding.UTF8;
+            var result = hash.ComputeHash(enc.GetBytes(value));
+
+            foreach (byte b in result)
+                sb.Append(b.ToString("x2"));
+        }
+
+        return sb.ToString();
+    }
 }
