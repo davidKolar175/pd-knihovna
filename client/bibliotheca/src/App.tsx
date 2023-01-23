@@ -3,6 +3,7 @@ import './App.css';
 import React, { useState } from 'react';
 import Login from './Login';
 import Catalog from './Catalog';
+import { Admin } from './AdminComponent';
 
 interface Book {
   id: number;
@@ -22,11 +23,20 @@ const App: React.FC = () => {
     { id: 2, title: "The Lord of the Rings", author: "J.R.R. Tolkien", pages: 1178, published: "1954", stock: 5 },
     { id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", pages: 310, published: "1937", stock: 8 }
   ]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const users = [
+    { id: 1, username: "user1", password: "password1", role: "basic" }, 
+    { id: 2, username: "admin", password: "admin", role: "admin" }, 
+    { id: 3, username: "user2", password: "password2", role: "basic" },
+  ];
 
   const handleLogin = (username: string, password: string) => {
-    // Any non-empty values will be accepted. For now...
-    if (username && password) {
+    const user = users.find(user => user.username === username && user.password === password);
+    if(user){
       setLoggedIn(true);
+      if(user.role === "admin"){
+        setIsAdmin(true);
+      }
     }
   };
 
@@ -55,6 +65,7 @@ const App: React.FC = () => {
       ) : (
         <>
           <Catalog books={books} onAddToCart={handleAddToCart} onLogout={handleLogout} />
+          {isAdmin && <Admin />}
           <div className="cart-container">
             <h3>Cart</h3>
             {cart.map(book => (

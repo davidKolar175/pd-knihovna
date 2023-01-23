@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import './Login.css';
 
+const httpGet = () => {
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", "https://localhost:7169/api/users", false );
+  xmlHttp.setRequestHeader("authorization", "Basic aGFoYTphc2Rn");
+  xmlHttp.send(null);
+  return xmlHttp.responseText;
+}
+
 interface LoginProps {
   onLogin: (username: string, password: string) => void;
 }
@@ -11,6 +19,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log(httpGet());
     onLogin(username, password);
   };
 

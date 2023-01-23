@@ -54,6 +54,9 @@
     margin-left: auto;
     margin-top: 1rem;
     margin-bottom: 1rem;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
 }
 
 .logout-btn:hover {
