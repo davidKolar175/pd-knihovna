@@ -1,4 +1,5 @@
 using BibliothecaApi;
+using BibliothecaApi.Services;
 using BookStoreApi.Models;
 using BookStoreApi.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -12,6 +13,7 @@ builder.Services.Configure<BookStoreDatabaseSettings>(
 
 builder.Services.AddSingleton<BooksService>();
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<AppService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(

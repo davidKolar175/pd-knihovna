@@ -11,8 +11,7 @@ public class UsersService
 {
     private readonly IMongoCollection<User> _usersCollection;
 
-    public UsersService(
-        IOptions<BookStoreDatabaseSettings> bookStoreDatabaseSettings)
+    public UsersService(IOptions<BookStoreDatabaseSettings> bookStoreDatabaseSettings)
     {
         var mongoClient = new MongoClient(
             bookStoreDatabaseSettings.Value.ConnectionString);
