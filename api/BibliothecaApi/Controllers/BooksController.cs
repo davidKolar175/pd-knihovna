@@ -16,7 +16,7 @@ public class BooksController : ControllerBase
     public BooksController(BooksService booksService) => _booksService = booksService;
 
     [HttpGet]
-    public async Task<List<Book>> Get(string? name, string? author, int? year) => await _booksService.GetAsync(name, author, year);
+    public async Task<List<Book>> Get(string? bookName, string? author, int? year, string? sortBy) => await _booksService.GetAsync(bookName, author, year, sortBy);
 
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Book>> Get(string id)

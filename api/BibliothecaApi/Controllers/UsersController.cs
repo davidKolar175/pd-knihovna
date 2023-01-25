@@ -17,8 +17,8 @@ public class UsersController : ControllerBase
         _usersService = booksService;
 
     [HttpGet]
-    public async Task<List<User>> Get(string? name, string? lastName, string? address, string? nin) =>
-        await _usersService.GetAsync(name, lastName, address, nin);
+    public async Task<List<User>> Get(string? firstName, string? lastName, string? address, string? nin, string? sortby) =>
+        await _usersService.GetAsync(firstName, lastName, address, nin, sortby);
 
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<User>> Get(string id)

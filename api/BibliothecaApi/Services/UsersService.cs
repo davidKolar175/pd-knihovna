@@ -1,7 +1,9 @@
 ﻿using BibliothecaApi.Models;
 using BookStoreApi.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using SharpCompress.Common;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,23 +20,28 @@ public class UsersService
         _usersCollection = mongoDatabase.GetCollection<User>(bookStoreDatabaseSettings.Value.UsersCollectionName);
     }
 
-    public async Task<List<User>> GetAsync(string? name, string? lastName, string? address, string? nin)
+    public async Task<List<User>> GetAsync(string? firstName, string? lastName, string? address, string? nin, string? sortBy)
     {
         var filter = Builders<User>.Filter.Empty;
 
-        if (!string.IsNullOrEmpty(name))
-            filter &= Builders<User>.Filter.Eq(x => x.UserName, name);
+        if (!string.IsNullOrEmpty(firstName))
+            filter &= Builders<User>.Filter.Regex(nameof(User.FirstName), new BsonRegularExpression(firstName, "i"));
 
         if (!string.IsNullOrEmpty(lastName))
-            filter &= Builders<User>.Filter.Eq(x => x.UserName, lastName);
+            filter &= Builders<User>.Filter.Regex(nameof(User.LastName), new BsonRegularExpression(lastName, "i"));
 
         if (!string.IsNullOrEmpty(address))
-            filter &= Builders<User>.Filter.Eq(x => x.UserName, address);
+            filter &= Builders<User>.Filter.Regex(nameof(User.Address), new BsonRegularExpression(address, "i"));
 
         if (!string.IsNullOrEmpty(nin))
-            filter &= Builders<User>.Filter.Eq(x => x.UserName, nin);
+            filter &= Builders<User>.Filter.Regex(nameof(User.NIN), new BsonRegularExpression(nin, "i"));
 
-        return await _usersCollection.Find(filter).ToListAsync();
+        var itemsFluentFind = _usersCollection.Find(filter);
+
+        if (string.IsNullOrEmpty(sortBy))
+            return await itemsFluentFind.ToListAsync();
+
+        return await itemsFluentFind.Sort(GetSortByFunction(sortBy)).ToListAsync();
     }
 
     public async Task<User?> GetAsync(string id) =>
@@ -68,5 +75,22 @@ public class UsersService
         }
 
         return sb.ToString();
+    }
+
+    private static SortDefinition<User> GetSortByFunction(string sortBy)
+    {
+        if (sortBy == nameof(User.FirstName))
+            return Builders<User>.Sort.Ascending(a => a.FirstName);
+
+        if (sortBy == nameof(User.LastName))
+            return Builders<User>.Sort.Ascending(a => a.LastName);
+
+        if (sortBy == nameof(User.Address))
+            return Builders<User>.Sort.Ascending(a => a.Address);
+
+        if (sortBy == nameof(User.NIN))
+            return Builders<User>.Sort.Ascending(a => a.NIN);
+
+        return Builders<User>.Sort.Ascending(a => a.FirstName);
     }
 }
