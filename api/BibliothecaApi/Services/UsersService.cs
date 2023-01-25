@@ -13,14 +13,9 @@ public class UsersService
 
     public UsersService(IOptions<BookStoreDatabaseSettings> bookStoreDatabaseSettings)
     {
-        var mongoClient = new MongoClient(
-            bookStoreDatabaseSettings.Value.ConnectionString);
-
-        var mongoDatabase = mongoClient.GetDatabase(
-            bookStoreDatabaseSettings.Value.DatabaseName);
-
-        _usersCollection = mongoDatabase.GetCollection<User>(
-            bookStoreDatabaseSettings.Value.UsersCollectionName);
+        var mongoClient = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
+        var mongoDatabase = mongoClient.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
+        _usersCollection = mongoDatabase.GetCollection<User>(bookStoreDatabaseSettings.Value.UsersCollectionName);
     }
 
     public async Task<List<User>> GetAsync(string? name, string? lastName, string? address, string? nin)
@@ -53,7 +48,7 @@ public class UsersService
         await _usersCollection.InsertOneAsync(newUser);
     }
 
-    public async Task UpdateAsync(string id, User updatedUser) =>
+    public async Task UpdateAsync(string id, User updatedUser, bool isAdmin) =>
         await _usersCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
 
     public async Task RemoveAsync(string id) =>

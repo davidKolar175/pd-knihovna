@@ -2,6 +2,7 @@
 using BookStoreApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookStoreApi.Controllers;
 
@@ -43,16 +44,25 @@ public class UsersController : ControllerBase
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, User updatedUser)
     {
+        var isAdmin = false;
+        var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+        if (identity != null)
+        {
+            var roleClaim = identity.Claims.First(x => x.Type == ClaimTypes.Role);
+            if (roleClaim.Value == "Admin")
+                isAdmin = true;
+
+        }
+
         var user = await _usersService.GetAsync(id);
 
         if (user is null)
-        {
             return NotFound();
-        }
 
         updatedUser.Id = user.Id;
 
-        await _usersService.UpdateAsync(id, updatedUser);
+        await _usersService.UpdateAsync(id, updatedUser, isAdmin);
 
         return NoContent();
     }

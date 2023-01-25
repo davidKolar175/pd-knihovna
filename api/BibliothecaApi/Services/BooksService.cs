@@ -10,18 +10,26 @@ public class BooksService
 
     public BooksService(IOptions<BookStoreDatabaseSettings> bookStoreDatabaseSettings)
     {
-        var mongoClient = new MongoClient(
-            bookStoreDatabaseSettings.Value.ConnectionString);
-
-        var mongoDatabase = mongoClient.GetDatabase(
-            bookStoreDatabaseSettings.Value.DatabaseName);
-
-        _booksCollection = mongoDatabase.GetCollection<Book>(
-            bookStoreDatabaseSettings.Value.BooksCollectionName);
+        var mongoClient = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
+        var mongoDatabase = mongoClient.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
+        _booksCollection = mongoDatabase.GetCollection<Book>(bookStoreDatabaseSettings.Value.BooksCollectionName);
     }
 
-    public async Task<List<Book>> GetAsync() =>
-        await _booksCollection.Find(_ => true).ToListAsync();
+    public async Task<List<Book>> GetAsync(string? name, string? author, int? year)
+    {
+        var filter = Builders<Book>.Filter.Empty;
+
+        if (!string.IsNullOrEmpty(name))
+            filter &= Builders<Book>.Filter.Eq(x => x.BookName, name);
+
+        if (!string.IsNullOrEmpty(author))
+            filter &= Builders<Book>.Filter.Eq(x => x.Author, author);
+
+        if (year is not null)
+            filter &= Builders<Book>.Filter.Eq(x => x.Published, year);
+
+        return await _booksCollection.Find(filter).ToListAsync();
+    }
 
     public async Task<Book?> GetAsync(string id) =>
         await _booksCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
