@@ -11,8 +11,7 @@ public class AppController : ControllerBase
 {
     private readonly AppService _appService;
 
-    public AppController(AppService appService) =>
-        _appService = appService;
+    public AppController(AppService appService) => _appService = appService;
 
     [HttpPost("BackupDatabase")]
     public async Task<IActionResult> BackupDatabase()
