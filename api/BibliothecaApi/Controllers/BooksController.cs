@@ -3,6 +3,8 @@ using BookStoreApi.Models;
 using BookStoreApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using System.Net;
 
 namespace BookStoreApi.Controllers;
 
@@ -89,10 +91,24 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost("ReturnBook")]
-    public async Task<IActionResult> ReturnBook()
+    public async Task<IActionResult> ReturnBook(string userId, string bookId)
     {
         /* Tady bude logika vrácení. Uživatelé můžou vrátit knihy dřív, než vyprší 6 dnů. */
-        await Task.Delay(0);
+        var user = await _usersService.GetAsync(userId);
+        var book = await _booksService.GetAsync(bookId);
+        var borrowedBook = await _borrowedBookService.GetAsync(bookId,userId);
+
+        if (user == null || book == null || borrowedBook == null)
+        {
+            throw new Exception("User, book, or borrowed book not found");
+        }
+
+        user.BorrowedBooks.Remove(borrowedBook);
+        book.Copies = +1;
+        await _borrowedBookService.RemoveAsync(borrowedBook.Id);
+        await _usersService.UpdateAsync(userId, user, user.IsAdmin);
+        await _booksService.UpdateAsync(bookId, book);
+        //await Task.Delay(0);
         return Ok();
     }
 

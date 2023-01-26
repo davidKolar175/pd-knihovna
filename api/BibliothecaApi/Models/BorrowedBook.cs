@@ -1,10 +1,14 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace BibliothecaApi.Models
 {
     public class BorrowedBook
     {
-        public string UserId { get; set; } = null!;
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+        public string UserId { get; set; }
 
         public string BookId { get; set; } = null!;
 

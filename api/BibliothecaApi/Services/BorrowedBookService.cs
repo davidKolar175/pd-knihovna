@@ -15,6 +15,8 @@ namespace BookStoreApi.Services
             var mongoDatabase = mongoClient.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
             _borrowedBooksCollection = mongoDatabase.GetCollection<BorrowedBook>(bookStoreDatabaseSettings.Value.BorrowedBooksCollectionName);
         }
+        public async Task<BorrowedBook> GetAsync(string bookId, string userId) =>
+            await _borrowedBooksCollection.Find(bb => bb.UserId == userId && bb.BookId == bookId).FirstOrDefaultAsync();
 
         public async Task<List<BorrowedBook>> GetBorrowedBooksByUserAsync(string userId) =>
             await _borrowedBooksCollection.Find(x => x.UserId == userId).ToListAsync();
