@@ -4,7 +4,7 @@ import "./Login.css";
 const postLogin = async (userName: string, password: string): Promise<boolean> => {
     // const hehe = Buffer.from(`${userName}:${password}`).toString("base64");
 
-    const res = await fetch("https://localhost:7169/login", {  // Enter your IP address here
+    const res = await fetch("https://localhost:7169/api/login", {  // Enter your IP address here
         method: "POST",
         mode: "cors",
         headers: {

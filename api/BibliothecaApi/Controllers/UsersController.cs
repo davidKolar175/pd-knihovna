@@ -1,4 +1,5 @@
 ﻿using BibliothecaApi.Models;
+using BookStoreApi.Models;
 using BookStoreApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,15 @@ namespace BookStoreApi.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly UsersService _usersService;
+    private readonly BooksService _booksService;
+    private readonly BorrowedBookService _borrowedBookService;
 
-    public UsersController(UsersService booksService) =>
-        _usersService = booksService;
+    public UsersController(UsersService usersService, BooksService bookService, BorrowedBookService borrowedBookService)
+    {
+        _usersService = usersService;
+        _booksService = bookService;
+        _borrowedBookService = borrowedBookService;
+    }
 
     [HttpGet]
     public async Task<List<User>> Get(string? firstName, string? lastName, string? address, string? nin, string? sortby) =>
@@ -26,11 +33,26 @@ public class UsersController : ControllerBase
         var user = await _usersService.GetAsync(id);
 
         if (user is null)
-        {
             return NotFound();
-        }
 
         return user;
+    }
+
+    [HttpGet("GetReadersOfBook")]
+    public async Task<List<User>> GetReadersOfBook(string bookId)
+    {
+        var borrowedBooks = await _borrowedBookService.GetBorrowedBooksByBookAsync(bookId);
+        var readers = new List<User>();
+
+        foreach (var reader in borrowedBooks)
+        {
+            var user = await _usersService.GetAsync(reader.UserId);
+            if (user is null)
+                throw new Exception("User not found!");
+            readers.Add(user);
+        }
+
+        return readers;
     }
 
     [HttpPost]

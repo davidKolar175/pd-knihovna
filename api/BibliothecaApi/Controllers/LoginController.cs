@@ -19,7 +19,7 @@ public class LoginController: ControllerBase
         _usersService = usersService;
     }
 
-    [HttpPost("~/Login")]
+    [HttpPost]
     [Authorize]
     public async Task<ActionResult<User>> Login()
     {

@@ -14,14 +14,14 @@ public class AppController : ControllerBase
     public AppController(AppService appService) =>
         _appService = appService;
 
-    [HttpPost("~/BackupDatabase")]
+    [HttpPost("BackupDatabase")]
     public async Task<IActionResult> BackupDatabase()
     {
         await _appService.BackupDatabase();
         return Ok();
     }
 
-    [HttpPost("~/RestoreDatabase")]
+    [HttpPost("RestoreDatabase")]
     public async Task<IActionResult> RestoreDatabase()
     {
         await _appService.RestoreDatabase();

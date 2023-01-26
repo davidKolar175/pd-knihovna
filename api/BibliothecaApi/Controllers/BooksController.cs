@@ -31,14 +31,29 @@ public class BooksController : ControllerBase
         var book = await _booksService.GetAsync(id);
 
         if (book is null)
-        {
             return NotFound();
-        }
 
         return book;
     }
 
-    [HttpPost("~/BorrowBook")]
+    [HttpGet("GetBorrowedBooks")]
+    public async Task<List<Book>> GetBorrowedBooks(string userId)
+    {
+        var borrowedBooks = await _borrowedBookService.GetBorrowedBooksByUserAsync(userId);
+        var books = new List<Book>();
+
+        foreach (var borrowedBook in borrowedBooks)
+        {
+            var book = await _booksService.GetAsync(borrowedBook.BookId);
+            if (book is null)
+                throw new Exception("Book not found!");
+            books.Add(book);
+        }
+
+        return books;
+    }
+
+    [HttpPost("BorrowBook")]
     public async Task<IActionResult> BorrowBook(string userId, string bookId)
     {
         /* Tady bude logika půjčení. Databáze bude muset určit, jestl si uživatel bude moct půjčit knihu nebo ne. */
@@ -73,7 +88,7 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("~/ReturnBook")]
+    [HttpPost("ReturnBook")]
     public async Task<IActionResult> ReturnBook()
     {
         /* Tady bude logika vrácení. Uživatelé můžou vrátit knihy dřív, než vyprší 6 dnů. */
