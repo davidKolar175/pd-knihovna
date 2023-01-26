@@ -12,8 +12,15 @@ namespace BookStoreApi.Controllers;
 public class BooksController : ControllerBase
 {
     private readonly BooksService _booksService;
+    private readonly UsersService _usersService;
+    private readonly BorrowedBookService _borrowedBookService;
 
-    public BooksController(BooksService booksService) => _booksService = booksService;
+    public BooksController(BooksService booksService, UsersService usersService, BorrowedBookService borrowedBookService)
+    {
+        _booksService = booksService;
+        _usersService = usersService;
+        _borrowedBookService = borrowedBookService;
+    }
 
     [HttpGet]
     public async Task<List<Book>> Get(string? bookName, string? author, int? year, string? sortBy) => await _booksService.GetAsync(bookName, author, year, sortBy);
@@ -32,10 +39,37 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost("~/BorrowBook")]
-    public async Task<IActionResult> BorrowBook()
+    public async Task<IActionResult> BorrowBook(string userId, string bookId)
     {
         /* Tady bude logika půjčení. Databáze bude muset určit, jestl si uživatel bude moct půjčit knihu nebo ne. */
-        await Task.Delay(0);
+        var user = await _usersService.GetAsync(userId);
+        var book = await _booksService.GetAsync(bookId);
+
+        if (user == null || book == null)
+        {
+            throw new Exception("User or book not found");
+        }
+        if (user.BorrowedBooks.Count >= 6)
+        {
+            throw new Exception("User has already borrowed the maximum number of books");
+        }
+        if (book.Copies <= 0)
+        {
+            throw new Exception("There are no more copies of this book available");
+        }
+
+        var borrowedBook = new BorrowedBook
+        {
+            UserId = userId,
+            BookId = bookId,
+            DueDate = DateTime.Now.AddDays(6)
+        };
+        await _borrowedBookService.CreateAsync(borrowedBook);
+        user.BorrowedBooks.Add(borrowedBook);
+        book.Copies = -1;
+        await _usersService.UpdateAsync(userId, user, user.IsAdmin);
+        await _booksService.UpdateAsync(bookId, book);
+        //await Task.Delay(0);
         return Ok();
     }
 
