@@ -24,4 +24,6 @@ public class User
     public bool IsBanned { get; set; }
 
     public bool IsAdmin { get; set; }
+
+    public List<BorrowedBook>? BorrowedBooks = new List<BorrowedBook>();
 }

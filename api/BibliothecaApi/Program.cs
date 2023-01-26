@@ -13,6 +13,7 @@ builder.Services.Configure<BookStoreDatabaseSettings>(
 
 builder.Services.AddSingleton<BooksService>();
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<BorrowedBookService>();
 builder.Services.AddSingleton<AppService>();
 
 builder.Services.AddControllers()
