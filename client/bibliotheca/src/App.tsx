@@ -17,12 +17,14 @@ interface Book {
 const App: React.FC = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [cart, setCart] = useState<Book[]>([]);
+
   //Just for the sake of example. I want to see some books.
   const [books, setBooks] = useState<Book[]>([
     { id: 1, title: "Harry Potter and the Philosopher's Stone", author: "J.K. Rowling", pages: 223, published: "1997", stock: 10 },
     { id: 2, title: "The Lord of the Rings", author: "J.R.R. Tolkien", pages: 1178, published: "1954", stock: 5 },
     { id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", pages: 310, published: "1937", stock: 8 }
   ]);
+
   const [isAdmin, setIsAdmin] = useState(false);
   const users = [
     { id: 1, username: "user1", password: "password1", role: "basic" }, 
@@ -30,11 +32,10 @@ const App: React.FC = () => {
     { id: 3, username: "user2", password: "password2", role: "basic" },
   ];
 
-  const handleLogin = (username: string, password: string) => {
-    const user = users.find(user => user.username === username && user.password === password);
-    if(user){
+  const handleLogin = (success: boolean, isAdmin: boolean) => {
+    if(success){
       setLoggedIn(true);
-      if(user.role === "admin"){
+      if(isAdmin){
         setIsAdmin(true);
       }
     }

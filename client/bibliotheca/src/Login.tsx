@@ -1,43 +1,55 @@
-import React, { useState } from 'react';
-import './Login.css';
+import React, { useState } from "react";
+import "./Login.css";
 
-const httpGet = () => {
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open( "GET", "https://localhost:7169/api/users", false );
-  xmlHttp.setRequestHeader("authorization", "Basic aGFoYTphc2Rn");
-  xmlHttp.send(null);
-  return xmlHttp.responseText;
+const postLogin = async (userName: string, password: string): Promise<boolean> => {
+    // const hehe = Buffer.from(`${userName}:${password}`).toString("base64");
+
+    const res = await fetch("https://localhost:7169/login", {  // Enter your IP address here
+        method: "POST",
+        mode: "cors",
+        headers: {
+            "Content-type": "text/plain; charset=UTF-8",
+            "authorization": `Basic ${btoa(unescape(encodeURIComponent(`${userName}:${password}`)))}`,
+        },
+    })
+
+    if (res.ok)
+        return true;
+
+    return false;
 }
 
 interface LoginProps {
-  onLogin: (username: string, password: string) => void;
+    onLogin: (success: boolean, isAdmin: boolean) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log(httpGet());
-    onLogin(username, password);
-  };
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (await postLogin(username, password)) {
+            onLogin(true, true);
+        }
+    };
 
-  return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      <label>
-        Username:
-        <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
-      </label>
-      <br />
-      <label>
-        Password:
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      </label>
-      <br />
-      <button type="submit">Login</button>
-    </form>
-  );
+    return (
+        <form className="login-form" onSubmit={handleSubmit}>
+            <label>
+                Username:
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
+            </label>
+            <br />
+            <label>
+                Password:
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+            </label>
+            <br />
+            <button type="submit">Login</button>
+            <button style={{ marginTop: 6 }}>Register</button>
+        </form>
+    );
 };
 
 export default Login;
