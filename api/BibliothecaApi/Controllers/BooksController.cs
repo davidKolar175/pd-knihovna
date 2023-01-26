@@ -84,7 +84,7 @@ public class BooksController : ControllerBase
         book.Copies = -1;
         await _usersService.UpdateAsync(userId, user, user.IsAdmin);
         await _booksService.UpdateAsync(bookId, book);
-        //await Task.Delay(0);
+
         return Ok();
     }
 

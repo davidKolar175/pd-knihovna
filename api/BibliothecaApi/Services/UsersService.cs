@@ -47,6 +47,9 @@ public class UsersService
     public async Task<User?> GetAsync(string id) =>
         await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
+    public async Task<List<User>> GetUnauthorizedUsersAsync() =>
+        await _usersCollection.Find(x => !x.IsAuthorized).ToListAsync();
+
     public async Task<User?> GetByUserNameAsync(string userName) =>
         await _usersCollection.Find(x => x.UserName == userName).FirstOrDefaultAsync();
 
@@ -55,8 +58,13 @@ public class UsersService
         await _usersCollection.InsertOneAsync(newUser);
     }
 
-    public async Task UpdateAsync(string id, User updatedUser, bool isAdmin) =>
+    public async Task UpdateAsync(string id, User updatedUser, bool isAdmin)
+    {
+        if (!isAdmin)
+            updatedUser.IsAuthorized = false;
+
         await _usersCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
+    }
 
     public async Task RemoveAsync(string id) =>
         await _usersCollection.DeleteOneAsync(x => x.Id == id);

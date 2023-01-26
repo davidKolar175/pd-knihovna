@@ -55,6 +55,11 @@ public class UsersController : ControllerBase
         return readers;
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("GetUnauthorizedUsers")]
+    public async Task<List<User>> GetUnauthorizedUsers() =>
+        await _usersService.GetUnauthorizedUsersAsync();
+
     [HttpPost]
     public async Task<IActionResult> Post(User newUser)
     {
@@ -96,9 +101,7 @@ public class UsersController : ControllerBase
         var user = await _usersService.GetAsync(id);
 
         if (user is null)
-        {
             return NotFound();
-        }
 
         await _usersService.RemoveAsync(id);
 
