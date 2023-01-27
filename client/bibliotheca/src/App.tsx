@@ -26,7 +26,7 @@ const loadBook = async (user: UserType): Promise<Book[]> => {
 
     const resTest = await res.text();
     const temp: any[] = JSON.parse(resTest);
-    const books: Book[] = temp.map(x => ({ id: x.Id, author: x.Author, title: x.BookName}) as Book)
+    const books: Book[] = temp.map(x => ({ id: x.Id, author: x.Author, title: x.BookName }) as Book)
     return books;
 };
 
@@ -79,6 +79,9 @@ const App: React.FC = () => {
                                 {book.title}
                             </div>
                         ))}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", paddingTop: 12 }}>
+                        <img src="https://i.kym-cdn.com/entries/icons/mobile/000/028/021/work.jpg" alt="It ain't much!" />
                     </div>
                 </>
             )}
