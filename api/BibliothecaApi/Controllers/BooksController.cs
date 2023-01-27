@@ -94,7 +94,7 @@ public class BooksController : ControllerBase
             return Forbid("There are no more copies of this book available");
 
         if (!user.IsAuthorized)
-            return Forbid("User is banned!");
+            return Forbid("User is not authorized!");
 
         var borrowedBook = new BorrowedBook
         {
