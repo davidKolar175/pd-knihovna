@@ -15,8 +15,7 @@ interface Book {
 }
 
 const loadBook = async (user: UserType): Promise<Book[]> => {
-
-    const res = await fetch(`https://localhost:7169/api/getborrowedBooks?userid=${user.id}`, {  // Enter your IP address here
+    const res = await fetch(`https://localhost:7169/api/Books/GetBorrowedBooks?userId=${user.id}`, {  // Enter your IP address here
         method: "GET",
         mode: "cors",
         headers: {
