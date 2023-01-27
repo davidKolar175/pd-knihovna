@@ -28,7 +28,7 @@ public class LoginController: ControllerBase
         var user = await _usersService.GetByUserNameAsync(credentials[0]);
 
         if (credentials[0] == "Admin") // TODO - smazat
-            return new User() { UserName="Admin", FirstName= "Pepa", LastName= "Zahrádka" };
+            return new User() { UserName="Admin", FirstName= "Pepa", LastName= "Zahrádka", IsAdmin = true };
 
         if (user != null)
         {

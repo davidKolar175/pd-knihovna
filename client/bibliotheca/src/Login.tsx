@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./Login.css";
+import { UserType } from "./types";
 
-const postLogin = async (userName: string, password: string): Promise<boolean> => {
+const postLogin = async (userName: string, password: string): Promise<UserType | false> => {
     // const hehe = Buffer.from(`${userName}:${password}`).toString("base64");
 
     const res = await fetch("https://localhost:7169/api/login", {  // Enter your IP address here
@@ -13,14 +14,17 @@ const postLogin = async (userName: string, password: string): Promise<boolean> =
         },
     })
 
-    if (res.ok)
-        return true;
+    if (!res.ok)
+        return false;
 
-    return false;
+    const resTest = await res.text();
+    const temp = JSON.parse(resTest);
+   
+    return { id: temp.Id, isAdmin: temp.IsAdmin, userName: temp.UserName, password: password };
 }
 
 interface LoginProps {
-    onLogin: (success: boolean, isAdmin: boolean) => void;
+    onLogin: (user: UserType) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -29,8 +33,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (await postLogin(username, password)) {
-            onLogin(true, true);
+        const loginResult = await postLogin(username, password);
+        if (loginResult !== false) {
+            onLogin(loginResult);
         }
     };
 
