@@ -31,7 +31,10 @@ public class LoginController: ControllerBase
             return new User() { UserName="Admin", FirstName= "Pepa", LastName= "Zahrádka" };
 
         if (user != null)
+        {
+            user.Password = null!;
             return user;
+        }
 
         return NotFound("Login failed!");
     }
