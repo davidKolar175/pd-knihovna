@@ -16,12 +16,14 @@ public class BooksController : ControllerBase
     private readonly BooksService _booksService;
     private readonly UsersService _usersService;
     private readonly BorrowedBookService _borrowedBookService;
+    private readonly BorrowHistoryService _borrowHistoryService;
 
-    public BooksController(BooksService booksService, UsersService usersService, BorrowedBookService borrowedBookService)
+    public BooksController(BooksService booksService, UsersService usersService, BorrowedBookService borrowedBookService, BorrowHistoryService borrowHistoryService)
     {
         _booksService = booksService;
         _usersService = usersService;
         _borrowedBookService = borrowedBookService;
+        _borrowHistoryService = borrowHistoryService;
     }
 
     [HttpGet]
@@ -55,6 +57,23 @@ public class BooksController : ControllerBase
         return books;
     }
 
+    [HttpGet("GetBorrowHistory")]
+    public async Task<List<BorrowHistory>> GetBorrowHistory(string userId)
+    {
+        var borrowHistory = await _borrowHistoryService.GetBorrowHistoryByUserAsync(userId);
+        var books = new List<BorrowHistory>();
+
+        foreach (var borrowedBook in borrowHistory)
+        {
+            var book = await _borrowHistoryService.GetAsync(borrowedBook.BookId, userId);
+            if (book is null)
+                throw new Exception("Book not found!");
+            books.Add(book);
+        }
+
+        return books;
+    }
+
     [HttpPost("BorrowBook")]
     public async Task<IActionResult> BorrowBook(string userId, string bookId)
     {
@@ -70,6 +89,10 @@ public class BooksController : ControllerBase
         {
             throw new Exception("User has already borrowed the maximum number of books");
         }
+        if (user.BorrowedBooks.Exists(x => x.BookId == bookId))
+        {
+            throw new Exception("User has already borrowed this book");
+        }
         if (book.Copies <= 0)
         {
             throw new Exception("There are no more copies of this book available");
@@ -81,9 +104,20 @@ public class BooksController : ControllerBase
             BookId = bookId,
             BorrowedDate = DateTime.Now
         };
-        await _borrowedBookService.CreateAsync(borrowedBook);
+
+        var historyItem = new BorrowHistory
+        {
+            UserId = borrowedBook.UserId,
+            BookId = borrowedBook.BookId,
+            BorrowDate = DateTime.Now,
+            ReturnDate = DateTime.Now.AddDays(6)
+        };
+
         user.BorrowedBooks?.Add(borrowedBook);
         book.Copies = book.Copies - 1;
+
+        await _borrowedBookService.CreateAsync(borrowedBook);
+        await _borrowHistoryService.CreateAsync(historyItem);
         await _usersService.UpdateAsync(userId, user, user.IsAdmin);
         await _booksService.UpdateAsync(bookId, book);
         return Ok();
@@ -96,16 +130,20 @@ public class BooksController : ControllerBase
         var user = await _usersService.GetAsync(userId);
         var book = await _booksService.GetAsync(bookId);
         var borrowedBook = await _borrowedBookService.GetAsync(bookId,userId);
+        var borrowHistoryBook = await _borrowHistoryService.GetAsync(bookId, userId);
 
         if (user == null || book == null || borrowedBook == null)
         {
             throw new Exception("User, book, or borrowed book not found");
         }
 
-        var hello = user.BorrowedBooks.Find( x => x.BookId == borrowedBook.BookId);
-        user.BorrowedBooks.Remove(hello);
+        var borrowItem = user.BorrowedBooks?.Find( x => x.BookId == borrowedBook.BookId);
+        borrowHistoryBook.ReturnDate = DateTime.Now;
+        user.BorrowedBooks?.Remove(borrowItem);
         book.Copies = book.Copies + 1;
-        await _borrowedBookService.RemoveAsync(hello.BookId);
+
+        await _borrowedBookService.RemoveAsync(borrowItem.BookId);
+        await _borrowHistoryService.UpdateAsync(bookId, borrowHistoryBook);
         await _usersService.UpdateAsync(userId, user, user.IsAdmin);
         await _booksService.UpdateAsync(bookId, book);
         return Ok();
@@ -149,7 +187,11 @@ public class BooksController : ControllerBase
             return NotFound();
         }
 
-        /* TODO - není možné mazat knihy, které má někdo půjčené! Logika by asi měla být uvnitř book service. */
+        /* Není možné mazat knihy, které má někdo půjčené! Logika by asi měla být uvnitř book service. */
+        var borrowedBooks = await _borrowedBookService.GetBorrowedBooksByBookAsync(id);
+        if (borrowedBooks.Exists(x => x.BookId == id))
+            throw new Exception("You can't delete borrowed book.");
+
         await _booksService.RemoveAsync(id);
 
         return NoContent();
