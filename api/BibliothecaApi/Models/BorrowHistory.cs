@@ -1,9 +1,9 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 
 namespace BibliothecaApi.Models
 {
-    public class BorrowedBook
+    public class BorrowHistory
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -13,6 +13,9 @@ namespace BibliothecaApi.Models
         public string BookId { get; set; } = null!;
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
-        public DateTime BorrowedDate { get; set; }
+        public DateTime BorrowDate { get; set; }
+
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        public DateTime ReturnDate { get; set; }
     }
 }

@@ -53,7 +53,8 @@ public class UsersService
     public async Task<User?> GetByUserNameAsync(string userName) =>
         await _usersCollection.Find(x => x.UserName == userName).FirstOrDefaultAsync();
 
-    public async Task CreateAsync(User newUser) {
+    public async Task CreateAsync(User newUser, bool isAdmin) {
+        newUser.IsAuthorized = isAdmin;
         newUser.Password = Sha256Hash(newUser.Password);
         await _usersCollection.InsertOneAsync(newUser);
     }
