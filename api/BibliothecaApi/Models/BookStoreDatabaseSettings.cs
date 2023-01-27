@@ -11,4 +11,6 @@ public class BookStoreDatabaseSettings
     public string UsersCollectionName { get; set; } = null!;
 
     public string BorrowedBooksCollectionName { get; set; } = null!;
+
+    public string BorrowHistoryCollectionName { get; set; } = null!;
 }
