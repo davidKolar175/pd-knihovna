@@ -27,10 +27,10 @@ namespace BookStoreApi.Services
         public async Task CreateAsync(BorrowedBook newBook) =>
             await _borrowedBooksCollection.InsertOneAsync(newBook);
 
-        public async Task UpdateAsync(string id, BorrowedBook updatedBook) =>
-            await _borrowedBooksCollection.ReplaceOneAsync(x => x.BookId == id, updatedBook);
+        public async Task UpdateAsync(string bookId, BorrowedBook updatedBook) =>
+            await _borrowedBooksCollection.ReplaceOneAsync(x => x.BookId == bookId, updatedBook);
 
-        public async Task RemoveAsync(string id) =>
-            await _borrowedBooksCollection.DeleteOneAsync(x => x.BookId == id);
+        public async Task RemoveAsync(string bookId) =>
+            await _borrowedBooksCollection.DeleteOneAsync(x => x.BookId == bookId);
     }
 }

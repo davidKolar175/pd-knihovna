@@ -13,6 +13,6 @@ namespace BibliothecaApi.Models
         public string BookId { get; set; } = null!;
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
-        public DateTime DueDate { get; set; }
+        public DateTime BorrowedDate { get; set; }
     }
 }

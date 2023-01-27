@@ -66,7 +66,7 @@ public class BooksController : ControllerBase
         {
             throw new Exception("User or book not found");
         }
-        if (user.BorrowedBooks.Count >= 6)
+        if (user.BorrowedBooks?.Count >= 6)
         {
             throw new Exception("User has already borrowed the maximum number of books");
         }
@@ -79,14 +79,13 @@ public class BooksController : ControllerBase
         {
             UserId = userId,
             BookId = bookId,
-            DueDate = DateTime.Now.AddDays(6)
+            BorrowedDate = DateTime.Now
         };
         await _borrowedBookService.CreateAsync(borrowedBook);
-        user.BorrowedBooks.Add(borrowedBook);
-        book.Copies = -1;
+        user.BorrowedBooks?.Add(borrowedBook);
+        book.Copies = book.Copies - 1;
         await _usersService.UpdateAsync(userId, user, user.IsAdmin);
         await _booksService.UpdateAsync(bookId, book);
-
         return Ok();
     }
 
@@ -103,12 +102,12 @@ public class BooksController : ControllerBase
             throw new Exception("User, book, or borrowed book not found");
         }
 
-        user.BorrowedBooks.Remove(borrowedBook);
-        book.Copies = +1;
-        await _borrowedBookService.RemoveAsync(borrowedBook.Id);
+        var hello = user.BorrowedBooks.Find( x => x.BookId == borrowedBook.BookId);
+        user.BorrowedBooks.Remove(hello);
+        book.Copies = book.Copies + 1;
+        await _borrowedBookService.RemoveAsync(hello.BookId);
         await _usersService.UpdateAsync(userId, user, user.IsAdmin);
         await _booksService.UpdateAsync(bookId, book);
-        //await Task.Delay(0);
         return Ok();
     }
 
