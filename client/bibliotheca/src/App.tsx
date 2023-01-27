@@ -33,6 +33,7 @@ const loadBook = async (user: UserType): Promise<Book[]> => {
 const App: React.FC = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [cart, setCart] = useState<Book[]>([]);
+    const [user, setUser] = useState<UserType | null>(null);
 
     //Just for the sake of example. I want to see some books.
     const [books, setBooks] = useState<Book[]>([]);
@@ -42,6 +43,7 @@ const App: React.FC = () => {
     const handleLogin = async (user: UserType) => {
         setLoggedIn(true);
         setIsAdmin(user.isAdmin);
+        setUser(user);
         const test = await loadBook(user);
         setBooks(test);
     };
@@ -71,7 +73,7 @@ const App: React.FC = () => {
             ) : (
                 <>
                     <Catalog books={books} onAddToCart={handleAddToCart} onLogout={handleLogout} />
-                    {isAdmin && <Admin />}
+                    {isAdmin && user !== null && <Admin user={user} />}
                     <div className="cart-container">
                         <h3>Cart</h3>
                         {cart.map(book => (

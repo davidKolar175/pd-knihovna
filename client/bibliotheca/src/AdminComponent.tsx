@@ -1,43 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "./AdminComponent.css";
+import { UserType } from './types';
 
-interface User {
-    id: number;
-    username: string;
-    password: string;
-    banned: boolean;
-}
 
-export const Admin: React.FC = () => {
-    const [users, setUsers] = useState<User[]>([
-        { id: 1, username: "user1", password: "password1", banned: false },
-        { id: 2, username: "user2", password: "password2", banned: false },
-        { id: 3, username: "user3", password: "password3", banned: false }
-    ]);
+const loadUnauthorizedUsers = async (user: UserType): Promise<UserType[]> => {
+    const res = await fetch(`https://localhost:7169/api/Users/GetUnauthorizedUsers`, {  // Enter your IP address here
+        method: "GET",
+        mode: "cors",
+        headers: {
+            "Content-type": "text/plain; charset=UTF-8",
+            "authorization": `Basic ${btoa(unescape(encodeURIComponent(`${user.userName}:${user.password}`)))}`,
+        },
+    })
 
-    const handleBanUser = (id: number) => {
-        setUsers(prevUsers => {
-            const updatedUsers = prevUsers.map(user => {
-                if (user.id === id) {
-                    return { ...user, banned: true }
-                }
-                return user
-            });
-            return updatedUsers;
-        });
-    };
+    const resTest = await res.text();
+    const temp: any[] = JSON.parse(resTest);
+    const books: UserType[] = temp.map(x => ({ id: x.Id, userName: x.UserName}) as UserType)
+    return books;
+};
 
-    const handleUnbanUser = (id: number) => {
-        setUsers(prevUsers => {
-            const updatedUsers = prevUsers.map(user => {
-                if (user.id === id) {
-                    return { ...user, banned: false }
-                }
-                return user
-            });
-            return updatedUsers;
-        });
-    };
+export const Admin: React.FC<{user: UserType}> = ({user}) => {
+    const [users, setUsers] = useState<UserType[]>([]);
+
+    useEffect(() => {
+        loadUnauthorizedUsers(user).then(x => setUsers(x));
+    }, [user])
 
 
     return (
@@ -54,14 +41,11 @@ export const Admin: React.FC = () => {
                 <tbody>
                     {users.map(user => (
                         <tr key={user.id}>
-                            <td>{user.username}</td>
-                            <td>{user.banned ? "Yes" : "No"}</td>
+                            <td>{user.userName}</td>
+                            <td>{"Unauthorized"}</td>
                             <td>
-                                <button onClick={() => handleBanUser(user.id)} disabled={user.banned}>
-                                    Ban User
-                                </button>
-                                <button onClick={() => handleUnbanUser(user.id)} disabled={!user.banned}>
-                                    Unban User
+                                <button>
+                                    Authorize user
                                 </button>
                             </td>
                         </tr>
