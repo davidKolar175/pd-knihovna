@@ -34,7 +34,7 @@ export const Admin: React.FC<{user: UserType}> = ({user}) => {
                 <thead>
                     <tr>
                         <th>Username</th>
-                        <th>Banned</th>
+                        <th>Authorized</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
