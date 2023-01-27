@@ -25,7 +25,7 @@ const Catalog: React.FC<CatalogProps> = ({ books, onAddToCart, onLogout }) => {
           <h3>{book.title}</h3>
           <p>Author: {book.author}</p>
           <p>Pages: {book.pages}</p>
-          <button onClick={() => onAddToCart(book)}>Borrow</button>
+          <button onClick={() => onAddToCart(book)}>Return</button>
         </div>
       ))}
     </div>
