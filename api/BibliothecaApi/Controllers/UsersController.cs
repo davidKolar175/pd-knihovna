@@ -63,8 +63,17 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(User newUser)
     {
-        await _usersService.CreateAsync(newUser);
+        var isAdmin = false;
+        var identity = HttpContext.User.Identity as ClaimsIdentity;
 
+        if (identity != null)
+        {
+            var roleClaim = identity.Claims.First(x => x.Type == ClaimTypes.Role);
+            if (roleClaim.Value == "Admin")
+                isAdmin = true;
+        }
+
+        await _usersService.CreateAsync(newUser, isAdmin);
         return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
     }
 

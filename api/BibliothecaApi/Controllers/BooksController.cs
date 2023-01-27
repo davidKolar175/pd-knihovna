@@ -82,21 +82,19 @@ public class BooksController : ControllerBase
         var book = await _booksService.GetAsync(bookId);
 
         if (user == null || book == null)
-        {
-            throw new Exception("User or book not found");
-        }
+            return NotFound("User or book not found");
+
         if (user.BorrowedBooks?.Count >= 6)
-        {
-            throw new Exception("User has already borrowed the maximum number of books");
-        }
+            return Forbid("User has already borrowed the maximum number of books");
+
         if (user.BorrowedBooks.Exists(x => x.BookId == bookId))
-        {
-            throw new Exception("User has already borrowed this book");
-        }
+            return Forbid("User has already borrowed this book");
+
         if (book.Copies <= 0)
-        {
-            throw new Exception("There are no more copies of this book available");
-        }
+            return Forbid("There are no more copies of this book available");
+
+        if (!user.IsAuthorized)
+            return Forbid("User is banned!");
 
         var borrowedBook = new BorrowedBook
         {
